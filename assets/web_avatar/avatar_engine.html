@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Wesal Motion Engine</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/kalidokit@1.1.5/dist/kalidokit.umd.js"></script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: transparent; }
+    #input_video { position: absolute; bottom: 15px; left: 15px; width: 100px; height: 75px; transform: scaleX(-1); border-radius: 12px; z-index: 10; border: 2px solid #00A86B; object-fit: cover; }
+    model-viewer { width: 100%; height: 100%; --background-color: transparent; }
+  </style>
+</head>
+<body>
+
+  <video id="input_video" autoplay playsinline muted></video>
+
+  <model-viewer id="avatar_model" src="" autoplay camera-controls="false" interaction-prompt="none"></model-viewer>
+
+  <script>
+    const videoElement = document.getElementById('input_video');
+    const modelViewer = document.getElementById('avatar_model');
+
+    function loadSelectedAvatar() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const character = urlParams.get('char') || 'salman';
+      
+      if (character === 'نجد') {
+        modelViewer.src = 'najd.glb';
+      } else {
+        modelViewer.src = 'salman.glb';
+      }
+    }
+
+    loadSelectedAvatar();
+
+    function onResults(results) {
+      if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) return;
+      
+      const handLandmarks = results.multiHandLandmarks[0];
+      const riggedHand = Kalidokit.Hand.solve(handLandmarks, 'Right');
+
+      if (riggedHand && modelViewer.model) {
+        const coreModel = modelViewer.model.scenegraph;
+        
+        const wristBone = coreModel.findObjectByName("RightHand");
+        if (wristBone) {
+          wristBone.rotation.set(riggedHand.pitch, riggedHand.yaw, riggedHand.roll);
+        }
+
+        const fingers = ['Thumb', 'Index', 'Middle', 'Ring', 'Little'];
+        fingers.forEach(finger => {
+            for(let i = 1; i <= 3; i++) {
+                const bone = coreModel.findObjectByName(`RightHand${finger}${i}`);
+                if (bone && riggedHand[finger.toLowerCase()]) {
+                    const fData = riggedHand[finger.toLowerCase()][i-1];
+                    bone.rotation.set(fData.x, fData.y, fData.z);
+                }
+            }
+        });
+      }
+    }
+
+    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+    hands.onResults(onResults);
+
+    const camera = new Camera(videoElement, {
+      onFrame: async () => { await hands.send({image: videoElement}); },
+      width: 640, height: 480
+    });
+    camera.start();
+  </script>
+</body>
+</html>

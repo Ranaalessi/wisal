@@ -1,0 +1,52 @@
+name: flutter_application_1
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.11.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.5.4
+  url_launcher: ^6.3.1
+  speech_to_text: ^7.4.0
+  camera: ^0.12.0+1
+  permission_handler: ^12.0.1
+  flutter_tts: ^4.2.5
+  o3d: ^3.1.0
+  flutter_3d_controller: ^2.3.0 
+  model_viewer_plus: ^1.9.3
+  webview_flutter: ^4.13.1
+  tflite_flutter: ^0.12.1
+  http: ^1.6.0
+  
+  google_mlkit_pose_detection: ^0.14.1
+  web_socket_channel: ^3.0.0
+  
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/Logo.png
+    - assets/images/Salman.png
+    - assets/images/Najd.png
+    - assets/images/x_logo.png
+    - assets/images/tiktok_logo.png
+    - assets/images/instagram_logo.png
+    - assets/images/
+    - assets/web_avatar/avatar_engine.html
+    - assets/web_avatar/Najd.glb
+    - assets/web_avatar/Najd_salam.glb
+    - assets/web_avatar/Salman.glb
+    - assets/web_avatar/Salman_salam.glb
+    - assets/signs/sign_motion_dictionary.json
+    - assets/signs/camera_motion_templates.json
+    - assets/wisal_model.tflite
+    - assets/labels.txt
